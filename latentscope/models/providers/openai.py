@@ -13,7 +13,11 @@ class OpenAIEmbedProvider(EmbedModelProvider):
             print("ERROR: No API key found for OpenAI")
             print("Missing 'OPENAI_API_KEY' variable in:", f"{os.getcwd()}/.env")
 
-        base_url = get_key("OPENAI_BASE_URL")
+        if self.base_url is None:
+            base_url = get_key("OPENAI_BASE_URL")
+        else:
+            base_url = self.base_url
+        
         if base_url is not None:
             self.client = OpenAI(api_key=api_key, base_url=base_url)
         else:

@@ -9,7 +9,7 @@ from .providers.nltk import NLTKChatProvider
 
 # We use a universal id system for models where its:
 # <provider>-<model-name> with model-name replacing "/"" with "___"
-# i.e. "nomic-ai/nomic-embed-text-v1.5" becomes: 
+# i.e. "nomic-ai/nomic-embed-text-v1.5" becomes:
 # "transformers-nomic-ai___nomic-embed-text-v1.5"
 # or OpenAI's "text-embedding-3-small" becomes:
 # "openai-text-embedding-3-small"
@@ -33,7 +33,7 @@ def get_embedding_model_dict(id):
 def get_embedding_model(id):
     """Returns a ModelProvider instance for the given model id."""
 
-    # For backwards compatibility with the old preset transformers models 
+    # For backwards compatibility with the old preset transformers models
     # (all of which were also HF sentence transformers)
     if id.startswith("transformers-"):
         id = id.replace("transformers-", "🤗-")
@@ -47,13 +47,30 @@ def get_embedding_model(id):
             "name": model_name,
             "params": {}
         }
+    elif id.startswith("custom_embedding-"):
+        # Get custom model from custom_models.json
+        import os
+        from latentscope.util import get_data_dir
+
+        DATA_DIR = get_data_dir()
+        custom_models_path = os.path.join(DATA_DIR, "custom_embedding_models.json")
+        if os.path.exists(custom_models_path):
+            with open(custom_models_path, "r") as f:
+                custom_models = json.load(f)
+            model = next((m for m in custom_models if m["id"] == id), None)
+            if model is None:
+                raise ValueError(f"Custom model {id} not found")
+        else:
+            raise ValueError("No custom models found")
     else:
         model = get_embedding_model_dict(id)
-      
+
     if model['provider'] == "🤗":
         return TransformersEmbedProvider(model['name'], model['params'])
     if model['provider'] == "openai":
         return OpenAIEmbedProvider(model['name'], model['params'])
+    if model["provider"] == "custom_embedding":
+        return OpenAIEmbedProvider(model["name"], model["params"], base_url=model["url"])
     if model['provider'] == "mistralai":
         return MistralAIEmbedProvider(model['name'], model['params'])
     if model['provider'] == "cohereai":
@@ -130,4 +147,3 @@ def get_chat_model(id):
         return MistralAIChatProvider(model['name'], model['params'])
     if model['provider'] == "nltk":
         return NLTKChatProvider(model['name'], model['params'])
-
