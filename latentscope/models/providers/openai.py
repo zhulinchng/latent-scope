@@ -17,31 +17,35 @@ class OpenAIEmbedProvider(EmbedModelProvider):
             base_url = get_key("OPENAI_BASE_URL")
         else:
             base_url = self.base_url
-        
+
         if base_url is not None:
             self.client = OpenAI(api_key=api_key, base_url=base_url)
         else:
             self.client = OpenAI(api_key=api_key)
 
-        self.encoder = tiktoken.encoding_for_model(self.name)
+        if not self.custom:
+            self.encoder = tiktoken.encoding_for_model(self.name)
 
     def embed(self, inputs, dimensions=None):
         time.sleep(0.01) # TODO proper rate limiting
-        enc = self.encoder
-        max_tokens = self.params["max_tokens"]
-        inputs = [b.replace("\n", " ") for b in inputs]
-        inputs = [enc.decode(enc.encode(b)[:max_tokens]) if len(enc.encode(b)) > max_tokens else b for b in inputs]
-        if dimensions is not None and dimensions > 0:
-            response = self.client.embeddings.create(
-                input=inputs,
-                model=self.name,
-                dimensions=dimensions
-            )
+        if not self.custom:
+            enc = self.encoder
+            max_tokens = self.params["max_tokens"]
+            inputs = [b.replace("\n", " ") for b in inputs]
+            inputs = [enc.decode(enc.encode(b)[:max_tokens]) if len(enc.encode(b)) > max_tokens else b for b in inputs]
+            if dimensions is not None and dimensions > 0:
+                response = self.client.embeddings.create(
+                    input=inputs,
+                    model=self.name,
+                    dimensions=dimensions
+                )
+            else:
+                response = self.client.embeddings.create(
+                    input=inputs,
+                    model=self.name
+                )
         else:
-            response = self.client.embeddings.create(
-                input=inputs,
-                model=self.name
-            )
+            response = self.client.embeddings.create(input=inputs, model=self.name)
         embeddings = [embedding.embedding for embedding in response.data]
         return embeddings
 

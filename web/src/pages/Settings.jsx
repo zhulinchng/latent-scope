@@ -3,6 +3,7 @@ import { apiService, apiUrl } from '../lib/apiService';
 const readonly = import.meta.env.MODE == 'read_only';
 
 import CustomModels from '../components/CustomModels';
+import CustomEmbeddingModels from '../components/CustomEmbeddingModels';
 
 import styles from './Settings.module.css';
 
@@ -88,6 +89,8 @@ const Settings = () => {
           Add a custom model to use for embeddings. Saved in:
           <code>{envSettings.data_dir}/custom_models.json</code>
         </div>
+
+        <CustomEmbeddingModels />
 
         <CustomModels />
       </div>

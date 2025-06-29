@@ -1,8 +1,9 @@
 class EmbedModelProvider:
-    def __init__(self, name, params, base_url=None):
+    def __init__(self, name, params, base_url=None, custom=False):
         self.name = name
         self.params = params
         self.base_url = base_url
+        self.custom = custom
 
     def load_model(self):
         raise NotImplementedError("This method should be implemented by subclasses.")

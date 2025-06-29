@@ -106,6 +106,14 @@ function Embedding() {
     );
   }, []);
 
+  const [customEmbeddingModels, setCustomEmbeddingModels] = useState([]);
+  useEffect(() => {
+    apiService.fetchCustomEmbeddingModels().then((data) => {
+      console.log('custom embedding models', data);
+      setCustomEmbeddingModels(data);
+    });
+  }, [setCustomEmbeddingModels]);
+
   const [presetModels, setPresetModels] = useState([]);
   useEffect(() => {
     apiService
@@ -152,6 +160,7 @@ function Embedding() {
   useEffect(() => {
     const am = recentModels
       .concat(HFModels)
+      .concat(customEmbeddingModels)
       .concat(presetModels)
       .filter((d) => !!d);
     let allOptions = am
@@ -177,7 +186,7 @@ function Embedding() {
     //   setDefaultModel(defaultOption);
     //   setModelId(defaultOption.id);
     // }
-  }, [presetModels, HFModels, recentModels, defaultModel]);
+  }, [presetModels, HFModels, customEmbeddingModels, recentModels, defaultModel]);
 
   useEffect(() => {
     if (embeddingsJob?.status === 'completed') {
@@ -207,6 +216,14 @@ function Embedding() {
       setPotentialEmbeddings(dataset.potential_embeddings);
     }
   }, [dataset]);
+
+  const handleSettingsClose = useCallback(() => {
+    console.log('CLOSING SETTINGS');
+    apiService.fetchCustomEmbeddingModels().then((data) => {
+      console.log('FETCHED CUSTOM EMBEDDING MODELS', data);
+      setCustomEmbeddingModels(data);
+    });
+  }, [setCustomEmbeddingModels]);
 
   const handleConfirmPotentialEmbedding = useCallback(
     (e, pe) => {
@@ -422,7 +439,13 @@ function Embedding() {
               onInputChange={searchHFModels}
             />
           </div>
-          <SettingsModal tooltip="Configure API keys for 3rd party models" />
+          <label>
+            <SettingsModal
+              tooltip="Configure API keys for 3rd party models or add custom models via URL."
+              color="primary"
+              onClose={() => handleSettingsClose()}
+            />
+          </label>
 
           {/* The form for creating a new embedding */}
           <form onSubmit={handleNewEmbedding}>

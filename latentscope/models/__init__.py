@@ -70,7 +70,7 @@ def get_embedding_model(id):
     if model['provider'] == "openai":
         return OpenAIEmbedProvider(model['name'], model['params'])
     if model["provider"] == "custom_embedding":
-        return OpenAIEmbedProvider(model["name"], model["params"], base_url=model["url"])
+        return OpenAIEmbedProvider(model["name"], model["params"], base_url=model["url"], custom=True)
     if model['provider'] == "mistralai":
         return MistralAIEmbedProvider(model['name'], model['params'])
     if model['provider'] == "cohereai":
