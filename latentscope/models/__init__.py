@@ -48,7 +48,7 @@ def get_embedding_model(id):
             "params": {}
         }
     elif id.startswith("custom_embedding-"):
-        # Get custom model from custom_models.json
+        # Get custom model from custom_embedding_models.json
         import os
         from latentscope.util import get_data_dir
 

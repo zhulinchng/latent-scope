@@ -87,10 +87,15 @@ const Settings = () => {
         <h3>Custom Models</h3>
         <div>
           Add a custom model to use for embeddings. Saved in:
-          <code>{envSettings.data_dir}/custom_models.json</code>
+          <code>{envSettings.data_dir}/custom_embedding_models.json</code>
         </div>
 
         <CustomEmbeddingModels />
+
+        <div>
+          Add a custom model to use for labelling clusters. Saved in:
+          <code>{envSettings.data_dir}/custom_models.json</code>
+        </div>
 
         <CustomModels />
       </div>
